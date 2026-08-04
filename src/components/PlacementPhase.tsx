@@ -140,10 +140,14 @@ export function PlacementPhase({
         ? { row: placement.row, col: placement.col + pivot }
         : { row: placement.row + pivot, col: placement.col }
 
-    // Try each alignment that still covers the anchor cell, then pick the first
-    // that fits. This lets a ship rotate in place even when the naive corner
-    // pivot would fall off the board or onto another ship.
-    for (let k = 0; k < length; k++) {
+    // Try each alignment that still covers the anchor cell, preferring the one
+    // that keeps the grabbed segment in place (k === pivot) and fanning out to
+    // nearby shifts. This rotates the ship in place instead of drifting it, yet
+    // still slides it just enough to clear the board edge or another ship.
+    const order = Array.from({ length }, (_, i) => i).sort(
+      (a, b) => Math.abs(a - pivot) - Math.abs(b - pivot),
+    )
+    for (const k of order) {
       const candidate: Placement = {
         id: placement.id,
         orientation,
