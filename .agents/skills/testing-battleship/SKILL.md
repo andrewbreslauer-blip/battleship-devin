@@ -17,7 +17,8 @@ Start screen (Easy/Medium/Hard) → "Deploy fleet" → placement (pre-randomized
 - Capture preview evidence **while the button is held**: `.cell.is-preview-ok` (green) / `.is-preview-bad` (red).
 - Ship positions are readable from each ship's `aria-label` ("Carrier, 5 cells, horizontal...") and grid styles; battle cells expose `aria-label` like "Fire at C3" / "C3, miss" / "J1, hit, Carrier sunk" — the stripped page HTML is the fastest way to assert state without pixel-reading.
 - Keyboard path: focus a ship, arrows nudge, `R` rotates, Delete removes.
-- A plain click (pointer-up with <4px movement) rotates a placed ship in place; the rotation is handled in the pointer-up handler, not a click event.
+- A plain click (pointer-up with Euclidean <6px movement) rotates a placed ship in place; the rotation is handled in the pointer-up handler, not a click event. rotate() keeps the grabbed segment fixed (scans alignments by |k-pivot|), so a long ship rotates in place without drifting across the board — verify no-drift by grabbing a middle segment and tapping 5+ times.
+- To force the **blocked-rotation** feedback (red hull flash `.ship.is-blocked` + shake, ship stays put): box a ship so no legal rotated orientation fits. Easiest deterministic setup: place the 2-cell Destroyer horizontal at A1–B1 and the Submarine horizontal at A2–C2 (both A2 and B2 occupied) — tapping the Destroyer then flashes red and does not rotate. The flash is 400ms; screenshot immediately after the click to catch the red hull.
 
 ## Fast win / loss through the UI
 - Win (Easy): fire a checkerboard parity pattern ((row+col) even), then chase hits along the line. Takes ~50 shots / ~10 min of batched clicks (1 s wait per shot for the 650 ms CPU reply).
