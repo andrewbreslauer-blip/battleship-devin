@@ -55,8 +55,20 @@ export function PlacementPhase({
   onStart,
 }: Props) {
   const [drag, setDrag] = useState<DragState | null>(null)
+  const [blockedId, setBlockedId] = useState<ShipId | null>(null)
   const movedRef = useRef(false)
   const originRef = useRef({ x: 0, y: 0 })
+  const blockedTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const flashBlocked = useCallback((id: ShipId) => {
+    setBlockedId(id)
+    if (blockedTimer.current) clearTimeout(blockedTimer.current)
+    blockedTimer.current = setTimeout(() => setBlockedId(null), 400)
+  }, [])
+
+  useEffect(() => () => {
+    if (blockedTimer.current) clearTimeout(blockedTimer.current)
+  }, [])
 
   const preview = drag?.hover ? originFor(drag, drag.hover) : null
   const previewCells = preview ? shipCells(preview, shipSpec(preview.id).length) : []
@@ -77,7 +89,7 @@ export function PlacementPhase({
 
     const onMove = (event: PointerEvent) => {
       const { x, y } = originRef.current
-      if (Math.abs(event.clientX - x) > 4 || Math.abs(event.clientY - y) > 4) movedRef.current = true
+      if (Math.hypot(event.clientX - x, event.clientY - y) > 6) movedRef.current = true
       setDrag((current) =>
         current ? { ...current, hover: cellFromPoint(event.clientX, event.clientY) } : current,
       )
@@ -87,7 +99,7 @@ export function PlacementPhase({
       setDrag(null)
       if (!movedRef.current) {
         const placement = placements.find((p) => p.id === drag.id)
-        if (placement) rotate(placement)
+        if (placement) rotate(placement, drag.offset)
         return
       }
       const hover = cellFromPoint(event.clientX, event.clientY)
@@ -118,12 +130,32 @@ export function PlacementPhase({
     }
   })
 
-  const rotate = (placement: Placement) => {
-    const rotated: Placement = {
-      ...placement,
-      orientation: placement.orientation === 'horizontal' ? 'vertical' : 'horizontal',
+  const rotate = (placement: Placement, pivot = 0) => {
+    const length = shipSpec(placement.id).length
+    const orientation: Orientation =
+      placement.orientation === 'horizontal' ? 'vertical' : 'horizontal'
+    // Cell the user grabbed (or the bow for keyboard rotates); keep it covered.
+    const anchor: Coord =
+      placement.orientation === 'horizontal'
+        ? { row: placement.row, col: placement.col + pivot }
+        : { row: placement.row + pivot, col: placement.col }
+
+    // Try each alignment that still covers the anchor cell, then pick the first
+    // that fits. This lets a ship rotate in place even when the naive corner
+    // pivot would fall off the board or onto another ship.
+    for (let k = 0; k < length; k++) {
+      const candidate: Placement = {
+        id: placement.id,
+        orientation,
+        row: orientation === 'vertical' ? anchor.row - k : anchor.row,
+        col: orientation === 'horizontal' ? anchor.col - k : anchor.col,
+      }
+      if (canPlace(placements, candidate)) {
+        onPlace(candidate)
+        return
+      }
     }
-    if (canPlace(placements, rotated)) onPlace(rotated)
+    flashBlocked(placement.id)
   }
 
   const nudge = (placement: Placement, delta: Coord) => {
@@ -170,7 +202,7 @@ export function PlacementPhase({
             return (
               <div
                 key={placement.id}
-                className={`ship${horizontal ? '' : ' ship-vertical'}${drag?.id === placement.id ? ' is-dragging' : ''}`}
+                className={`ship${horizontal ? '' : ' ship-vertical'}${drag?.id === placement.id ? ' is-dragging' : ''}${blockedId === placement.id ? ' is-blocked' : ''}`}
                 style={{
                   gridColumn: horizontal
                     ? `${placement.col + 2} / span ${spec.length}`
