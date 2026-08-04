@@ -307,6 +307,45 @@ kbd {
   cursor: grabbing;
 }
 
+.ship.is-blocked {
+  animation: ship-blocked 0.4s ease;
+  z-index: 2;
+}
+
+.ship.is-blocked .ship-hull {
+  fill: #6b2530;
+  stroke: var(--hit);
+}
+
+@keyframes ship-blocked {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-3px);
+  }
+
+  40% {
+    transform: translateX(3px);
+  }
+
+  60% {
+    transform: translateX(-2px);
+  }
+
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ship.is-blocked {
+    animation: none;
+  }
+}
+
 .ship-label {
   position: relative;
   font-size: min(0.62rem, calc(var(--cell) * 0.28));
