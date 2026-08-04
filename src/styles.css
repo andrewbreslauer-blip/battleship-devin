@@ -246,6 +246,7 @@ kbd {
   position: relative;
   display: grid;
   place-items: center;
+  overflow: hidden;
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -308,7 +309,7 @@ kbd {
 
 .ship-label {
   position: relative;
-  font-size: 0.62rem;
+  font-size: min(0.62rem, calc(var(--cell) * 0.28));
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #eaf3fc;
