@@ -11,6 +11,7 @@ import {
   shipSpec,
 } from '../game/types'
 import { Grid } from './Grid'
+import { ShipShape } from './ShipShape'
 
 interface Props {
   placements: Placement[]
@@ -169,7 +170,7 @@ export function PlacementPhase({
             return (
               <div
                 key={placement.id}
-                className={`ship${drag?.id === placement.id ? ' is-dragging' : ''}`}
+                className={`ship${horizontal ? '' : ' ship-vertical'}${drag?.id === placement.id ? ' is-dragging' : ''}`}
                 style={{
                   gridColumn: horizontal
                     ? `${placement.col + 2} / span ${spec.length}`
@@ -207,6 +208,7 @@ export function PlacementPhase({
                 role="button"
                 aria-label={`${spec.name}, ${spec.length} cells, ${placement.orientation}. Arrow keys to move, R to rotate.`}
               >
+                <ShipShape id={placement.id} orientation={placement.orientation} />
                 <span className="ship-label">{spec.name}</span>
               </div>
             )
@@ -232,10 +234,8 @@ export function PlacementPhase({
                   aria-label={placed ? `${spec.name} placed` : `Drag ${spec.name} onto the board`}
                 >
                   <span className="tray-name">{spec.name}</span>
-                  <span className="tray-pips" aria-hidden="true">
-                    {Array.from({ length: spec.length }, (_, i) => (
-                      <span key={i} className="pip" />
-                    ))}
+                  <span className="tray-shape" style={{ width: `${spec.length * 17}px` }} aria-hidden="true">
+                    <ShipShape id={spec.id} orientation="horizontal" />
                   </span>
                 </div>
               </li>

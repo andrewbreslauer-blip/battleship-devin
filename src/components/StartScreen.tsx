@@ -1,9 +1,9 @@
 import type { Difficulty } from '../game/types'
 
 const OPTIONS: { id: Difficulty; name: string; blurb: string }[] = [
-  { id: 'easy', name: 'Easy', blurb: 'Fires blindly at random cells.' },
-  { id: 'medium', name: 'Medium', blurb: 'Hunts, then chases every hit down the line.' },
-  { id: 'hard', name: 'Hard', blurb: 'Ranks every cell by how likely it is to hide a ship.' },
+  { id: 'easy', name: 'Easy', blurb: 'The computer fires at random. A relaxed game.' },
+  { id: 'medium', name: 'Medium', blurb: 'The computer searches the board and finishes off any ship it hits.' },
+  { id: 'hard', name: 'Hard', blurb: 'The computer calculates the most likely spot for your ships before every shot.' },
 ]
 
 interface Props {
@@ -15,7 +15,11 @@ interface Props {
 export function StartScreen({ difficulty, onSelect, onStart }: Props) {
   return (
     <section className="panel start-screen">
-      <h2>Choose your opponent</h2>
+      <h2>Battleship</h2>
+      <p className="start-intro">
+        Sink all five of the computer's ships before it sinks yours. First, pick how tough the
+        computer should be:
+      </p>
       <div className="difficulty-options" role="radiogroup" aria-label="Difficulty">
         {OPTIONS.map((option) => (
           <button
@@ -32,7 +36,7 @@ export function StartScreen({ difficulty, onSelect, onStart }: Props) {
         ))}
       </div>
       <button type="button" className="primary" onClick={onStart}>
-        Deploy fleet
+        Next: place your ships
       </button>
     </section>
   )

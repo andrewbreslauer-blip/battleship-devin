@@ -157,6 +157,11 @@ kbd {
   text-align: center;
 }
 
+.start-intro {
+  color: var(--text-dim);
+  margin: 0.5rem 0 0;
+}
+
 .difficulty-options {
   display: grid;
   gap: 0.6rem;
@@ -217,19 +222,12 @@ kbd {
   box-shadow: inset 0 0 0 2px var(--accent);
 }
 
-.cell.is-hit,
-.cell.is-occupied.is-hit {
-  background: var(--hit);
+.cell.is-hit {
+  background: rgb(248 113 113 / 22%);
 }
 
 .cell.is-miss {
-  background: #223347;
-  box-shadow: inset 0 0 0 4px rgb(123 147 179 / 45%);
-}
-
-.cell.is-revealed {
-  outline: 2px solid rgb(248 113 113 / 70%);
-  outline-offset: -2px;
+  background: #1a2b40;
 }
 
 .grid.is-dragging .ship {
@@ -245,15 +243,62 @@ kbd {
 }
 
 .ship {
-  background: linear-gradient(180deg, #3f6a97, #2c4d70);
-  border: 1px solid #5b87b5;
-  border-radius: 6px;
+  position: relative;
   display: grid;
   place-items: center;
   cursor: grab;
   touch-action: none;
   user-select: none;
-  overflow: hidden;
+}
+
+.ship-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.ship-hull {
+  fill: #3f6a97;
+  stroke: #6d95c0;
+  stroke-width: 2;
+}
+
+.ship-deck {
+  fill: #4f7aa6;
+}
+
+.ship-detail {
+  fill: #22415f;
+  stroke: #7ea3c9;
+  stroke-width: 1.5;
+}
+
+.ship-line {
+  fill: none;
+  stroke: #9fc3e8;
+  stroke-width: 2;
+  opacity: 0.7;
+}
+
+.ship-overlay {
+  position: relative;
+  pointer-events: none;
+}
+
+.ship-overlay.is-sunk .ship-hull {
+  fill: #6b2530;
+  stroke: #c25a66;
+}
+
+.ship-overlay.is-sunk .ship-deck {
+  fill: #7d2f3b;
+}
+
+.ship-overlay.is-sunk .ship-detail {
+  fill: #451a21;
+  stroke: #b3535f;
 }
 
 .ship.is-dragging {
@@ -262,11 +307,36 @@ kbd {
 }
 
 .ship-label {
+  position: relative;
   font-size: 0.62rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #d6e6f7;
+  color: #eaf3fc;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 70%);
   white-space: nowrap;
+}
+
+.ship.ship-vertical .ship-label {
+  writing-mode: vertical-rl;
+}
+
+.peg {
+  place-self: center;
+  width: calc(var(--cell) * 0.38);
+  height: calc(var(--cell) * 0.38);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.peg-hit {
+  background: var(--hit);
+  box-shadow: 0 0 0 2px rgb(7 15 26 / 60%), 0 0 8px rgb(248 113 113 / 80%);
+}
+
+.peg-miss {
+  background: #c8d6e8;
+  box-shadow: 0 0 0 2px rgb(7 15 26 / 45%);
+  opacity: 0.85;
 }
 
 /* Placement */
@@ -318,7 +388,16 @@ kbd {
   font-size: 0.9rem;
 }
 
-.tray-pips,
+.tray-shape {
+  display: inline-block;
+  height: 17px;
+}
+
+.tray-shape .ship-svg {
+  position: static;
+  display: block;
+}
+
 .fleet-status-pips {
   display: flex;
   gap: 3px;
