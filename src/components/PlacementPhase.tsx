@@ -83,14 +83,16 @@ export function PlacementPhase({
     }
 
     const onUp = (event: PointerEvent) => {
+      setDrag(null)
+      if (!movedRef.current) {
+        const placement = placements.find((p) => p.id === drag.id)
+        if (placement) rotate(placement)
+        return
+      }
       const hover = cellFromPoint(event.clientX, event.clientY)
-      setDrag((current) => {
-        if (current && hover) {
-          const candidate = originFor(current, hover)
-          if (canPlace(placements, candidate)) onPlace(candidate)
-        }
-        return null
-      })
+      if (!hover) return
+      const candidate = originFor(drag, hover)
+      if (canPlace(placements, candidate)) onPlace(candidate)
     }
 
     const onKey = (event: KeyboardEvent) => {
@@ -113,7 +115,7 @@ export function PlacementPhase({
       window.removeEventListener('pointercancel', onUp)
       window.removeEventListener('keydown', onKey)
     }
-  }, [drag, placements, onPlace])
+  })
 
   const rotate = (placement: Placement) => {
     const rotated: Placement = {
@@ -184,9 +186,6 @@ export function PlacementPhase({
                     : (event.clientY - rect.top) / (rect.height / spec.length)
                   const offset = Math.max(0, Math.min(spec.length - 1, Math.floor(along)))
                   startDrag(placement.id, offset, placement.orientation, event)
-                }}
-                onClick={() => {
-                  if (!movedRef.current) rotate(placement)
                 }}
                 onKeyDown={(event) => {
                   const actions: Record<string, () => void> = {
