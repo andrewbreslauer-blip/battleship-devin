@@ -59,16 +59,25 @@ export function PlacementPhase({
   const movedRef = useRef(false)
   const originRef = useRef({ x: 0, y: 0 })
   const blockedTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const blockedFrame = useRef<number | null>(null)
 
   const flashBlocked = useCallback((id: ShipId) => {
-    setBlockedId(id)
     if (blockedTimer.current) clearTimeout(blockedTimer.current)
+    if (blockedFrame.current) cancelAnimationFrame(blockedFrame.current)
+    // Clear then re-apply on the next frame so the shake animation restarts
+    // even when the same ship is tapped again while still highlighted.
+    setBlockedId(null)
+    blockedFrame.current = requestAnimationFrame(() => setBlockedId(id))
     blockedTimer.current = setTimeout(() => setBlockedId(null), 400)
   }, [])
 
-  useEffect(() => () => {
-    if (blockedTimer.current) clearTimeout(blockedTimer.current)
-  }, [])
+  useEffect(
+    () => () => {
+      if (blockedTimer.current) clearTimeout(blockedTimer.current)
+      if (blockedFrame.current) cancelAnimationFrame(blockedFrame.current)
+    },
+    [],
+  )
 
   const preview = drag?.hover ? originFor(drag, drag.hover) : null
   const previewCells = preview ? shipCells(preview, shipSpec(preview.id).length) : []
