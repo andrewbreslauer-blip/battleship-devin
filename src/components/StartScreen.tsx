@@ -36,7 +36,7 @@ export function StartScreen({ difficulty, onSelect, onStart }: Props) {
         ))}
       </div>
       <button type="button" className="primary" onClick={onStart}>
-        Next: place your ships
+        Next: Place Your Ships
       </button>
     </section>
   )
