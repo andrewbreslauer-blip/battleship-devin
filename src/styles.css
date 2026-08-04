@@ -321,6 +321,8 @@ kbd {
 }
 
 .peg {
+  position: relative;
+  z-index: 1;
   place-self: center;
   width: calc(var(--cell) * 0.38);
   height: calc(var(--cell) * 0.38);
