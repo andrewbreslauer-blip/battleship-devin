@@ -32,3 +32,7 @@ npm run build      # production build into dist/
 
 `src/game/` holds the pure, framework-free rules and AI; `src/state/gameReducer.ts` drives the
 game; `src/components/` is the React UI. Pushing to `main` builds and publishes to GitHub Pages.
+
+## Bugs
+
+See [BUGS.md](BUGS.md) for the log of flagged bugs, their status, and testing notes.
